@@ -1,0 +1,22 @@
+{
+  "name": "twitch-kiss-cam",
+  "version": "1.0.0",
+  "description": "Single out two chat users and let them express their love!",
+  "main": "kissCam.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/streddy/twitch-kiss-cam.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/streddy/twitch-kiss-cam/issues"
+  },
+  "homepage": "https://github.com/streddy/twitch-kiss-cam#readme",
+  "dependencies": {
+    "tmi.js": "^1.1.1"
+  }
+}
