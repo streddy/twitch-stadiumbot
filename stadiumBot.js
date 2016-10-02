@@ -326,7 +326,7 @@ client.on("chat", function (channel, user, message, self) {
          client.whisper(userArr[i], "You are fighting on Team " + teamTwoName + "!");
       }
 
-      setTimeout(fightFinish, 7000);
+      setTimeout(fightFinish, 10000);
       teamOneCount = 0;
       teamTwoCount = 0;
    }
