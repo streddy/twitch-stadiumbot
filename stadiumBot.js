@@ -55,10 +55,9 @@ var waveFinish = function() {
   /* More than 5 waves per second */
   if (waveCounter / 5.0 >= 1) {
     client.action(streamhost, "Nice wave!!!");
-  }
 
   /* Bad wave */
-  else {
+  } else {
     client.action(streamhost, "Terrible wave!!!");
   }
 
@@ -80,6 +79,7 @@ setInterval(function() {
   startTime = Date.now();
 }, 20000);
 
+/* Called when Fightme is finished */
 var fightFinish = function() {
   if (teamOneCount > teamTwoCount) {
     client.action(streamhost, "Team Kappa Wins!!");
@@ -162,9 +162,13 @@ client.on("chat", function (channel, user, message, self) {
 
    /* Handle fight behavior */
    if (fightStarted) {
+     
+     /* User is part of fight */
      if (teamOne.hasOwnProperty(user.username) || teamTwo.hasOwnProperty(user.username)) {
        var splitMessage = message.split(" ");
        var kapowCounter = 0;
+
+       /* Count number of KAPOWs */
        for (var i = 0; i < splitMessage.length; i++) {
          if (splitMessage[i] === "KAPOW") {
            kapowCounter++;
@@ -173,9 +177,8 @@ client.on("chat", function (channel, user, message, self) {
 
        if (teamOne.hasOwnProperty(user.username)) {
          teamOneCount += kapowCounter;
-       }
 
-       else {
+       } else {
          teamTwoCount += kapowCounter;
        }
      }
