@@ -1,14 +1,14 @@
 {
-  "name": "twitch-kiss-cam",
+  "name": "twitch-stadiumbot",
   "version": "1.0.0",
-  "description": "Single out two chat users and let them express their love!",
-  "main": "kissCam.js",
+  "description": "A bot to emulate the big stadium feel of being at a live sporting event!",
+  "main": "stadiumBot.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/streddy/twitch-kiss-cam.git"
+    "url": "git+https://github.com/streddy/twitch-stadiumbot.git"
   },
   "author": "",
   "license": "ISC",
