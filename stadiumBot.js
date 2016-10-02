@@ -21,6 +21,15 @@ var waveCounter = 0;
 var startTime = Date.now();
 var commentCount = 0;
 
+/* Fightme variables */
+var fightStarted = false;
+var teamOneCount = 0;
+var teamTwoCount = 0;
+var teamOne = {};
+var teamTwo = {};
+var fightMessage = "KAPOW"
+
+
 /* KissCam variables */
 var kisser1;
 var kisser2;
@@ -63,13 +72,31 @@ var waveFinish = function() {
 /* Checks every 10 seconds whether the chat is idle enough to start a wave */
 setInterval(function() {
   var delta = (Date.now() - startTime) * 1000;
-  if (!waveStarted) {
+  if (!waveStarted && !fightStarted) {
     if ((commentCount / delta) < 5) {
       waveInitiate();
     }
   }
   startTime = Date.now();
 }, 20000);
+
+var fightFinish = function() {
+  if (teamOneCount > teamTwoCount) {
+    client.action(streamhost, "Team Kappa Wins!!");
+  }
+
+  else if (teamTwoCount > teamOneCount) {
+    client.action(streamhost, "Team Kreygasm Wins!!");
+  }
+
+  else {
+    client.action(streamhost, "Tie!")
+  }
+
+  fightStarted = false;
+  teamOneCount = 0;
+  teamTwoCount = 0;
+}
 
 /* Reset kiss global variables */
 function resetKiss() {
@@ -120,17 +147,39 @@ client.on("part", function(channel, username, self) {
 /* Command handling */
 client.on("chat", function (channel, user, message, self) {
    if (self) return;
-   
+
    /* Add username to users associative array */
    console.log(user.username);
    users[user.username] = true;
-   
+
    /* Handle wave behavior */
    if (waveStarted) {
-      if (message === waveMessage) {
+      if (message.indexOf(waveMessage) !== -1) {
          waveCounter++;
       }
       return;
+   }
+
+   /* Handle fight behavior */
+   if (fightStarted) {
+     if (teamOne.hasOwnProperty(user.username) || teamTwo.hasOwnProperty(user.username)) {
+       var splitMessage = message.split(" ");
+       var kapowCounter = 0;
+       for (var i = 0; i < splitMessage.length; i++) {
+         if (splitMessage[i] === "KAPOW") {
+           kapowCounter++;
+         }
+       }
+
+       if (teamOne.hasOwnProperty(user.username)) {
+         teamOneCount += kapowCounter;
+       }
+
+       else {
+         teamTwoCount += kapowCounter;
+       }
+     }
+     return;
    }
 
    /* Handle kissing prompts */
@@ -143,7 +192,7 @@ client.on("chat", function (channel, user, message, self) {
                           "<3 @" + kisser1 + " DOESN'T WANT TO KISS :( <3");
             resetKiss();
          }
-      
+
       /* Kisser 2 no consent */
       } else if (user.username === kisser2 && message.toUpperCase() === "NO") {
          if (kisser2consent === false) {
@@ -151,14 +200,14 @@ client.on("chat", function (channel, user, message, self) {
                           "<3 @" + kisser2 + " DOESN'T WANT TO KISS :( <3");
             resetKiss()
          }
-      
+
       /* Kisser1 wants to kiss */
       } else if (user.username === kisser1 && message.toUpperCase() === "YES") {
          if (kisser2consent === true) {
             client.action(streamhost,
                           "<3 THEY KISSED!! <3");
             resetKiss();
-         
+
          } else {
             client.action(streamhost,
                           "<3 @" + kisser2 + ": @" + kisser1 + " WANTS TO KISS! WHAT DO YOU SAY? (YES/NO) <3");
@@ -171,7 +220,7 @@ client.on("chat", function (channel, user, message, self) {
             client.action(streamhost,
                           "<3 THEY KISSED!! <3");
             resetKiss();
-         
+
          } else {
             client.action(streamhost,
                           "<3 @" + kisser1 + ": @" + kisser2 + " WANTS TO KISS! WHAT DO YOU SAY? (YES/NO) <3");
@@ -191,13 +240,13 @@ client.on("chat", function (channel, user, message, self) {
       client.action(streamhost,
                     "!wave : Start a Kappa wave! Complete the wave for a treat!");
       client.action(streamhost,
-                    "!supersmash: A brawl erupted in the stadium! Spam that KAPOW emote to come out on top!");
+                    "!fightme: A brawl erupted in the stadium! Spam that KAPOW emote to come out on top!");
       client.action(streamhost,
                     "!kisscam: Make two users express their love for eachother <3");
       client.action(streamhost,
                     "!propose_'username': Embarass the love of your life in front of the stadium!");
    }
-   
+
    /* Food messages */
    if (message === "!forthebold") {
       client.action(streamhost,
@@ -217,25 +266,43 @@ client.on("chat", function (channel, user, message, self) {
      }
    }
 
+   if (message === "!fightme") {
+     var userArr = Object.keys(users);
+     fightStarted = true;
+     for (var i = 0; i < Math.floor(userArr.length / 2); i++) {
+       teamOne[userArr[i]] = true;
+       client.whisper(userArr[i], "You are fighting on Team Kappa!");
+     }
+
+     for (var i = Math.ceil(userArr.length / 2); i < userArr.length; i++) {
+       teamTwo[userArr[i]] = true;
+       client.whisper(userArr[i], "You are fighting on Team Kreygasm!");
+     }
+
+     setTimeout(fightFinish, 7000);
+     teamOneCount = 0;
+     teamTwoCount = 0;
+   }
+
    /* Kisscam */
    if (message === "!kisscam") {
       var userArr = Object.keys(users);
 
       client.action(streamhost,
                     "<3 WELCOME TO KISSCAM <3");
-     
+
       /* If there is only one recorded user */
       if (userArr.length < 2) {
          client.action(streamhost,
                        "<3 YOU'RE THE ONLY ONE HERE. WANT TO KISS YOURSELF? <3");
-      } else {   
+      } else {
          var userfinder1 = Math.floor(Math.random() * userArr.length);
          var userfinder2 = Math.floor(Math.random() * userArr.length);
 
          while(userfinder1 === userfinder2) {
             userfinder2 = Math.floor(Math.random() * userArr.length);
          }
-      
+
          kisser1 = userArr[userfinder1];
          kisser2 = userArr[userfinder2];
 
@@ -246,7 +313,7 @@ client.on("chat", function (channel, user, message, self) {
          kissmode = true;
       }
    }
-   
+
    /* For wave counting */
    commentCount++;
 });
