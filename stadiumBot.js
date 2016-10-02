@@ -41,7 +41,7 @@ var waveInitiate = function() {
 /* Called when wave is finished */
 var waveFinish = function() {
   /* More than 5 waves per second */
-  if (waveCounter / 5 >= 5) {
+  if (waveCounter / 5.0 >= 1) {
     client.action(streamhost, "Nice wave!!!");
   }
 
@@ -95,9 +95,9 @@ client.on("chat", function (channel, streamer, message, self) {
 setInterval(function() {
   var delta = (Date.now() - startTime) * 1000;
   if (!waveStarted) {
-    if ((commentCount / delta) < 1) {
+    if ((commentCount / delta) < 5) {
       waveInitiate();
     }
   }
   startTime = Date.now();
-}, 30000);
+}, 20000);
