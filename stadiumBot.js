@@ -90,7 +90,7 @@ var fightFinish = function() {
   }
 
   else {
-    client.action(streamhost, "")
+    client.action(streamhost, "Tie!")
   }
 
   fightStarted = false;
@@ -172,11 +172,11 @@ client.on("chat", function (channel, user, message, self) {
        }
 
        if (teamOne.hasOwnProperty(user.username)) {
-         teamOneCounter += kapowCounter;
+         teamOneCount += kapowCounter;
        }
 
        else {
-         teamTwoCounter += kapowCounter;
+         teamTwoCount += kapowCounter;
        }
      }
      return;
@@ -274,7 +274,7 @@ client.on("chat", function (channel, user, message, self) {
        client.whisper(userArr[i], "You are on Team One!");
      }
 
-     for (var i = Math.ceiling(userArr.length / 2); i++) {
+     for (var i = Math.ceil(userArr.length / 2); i < userArr.length; i++) {
        teamTwo[userArr[i]] = true;
        client.whisper(userArr[i], "You are on Team Two!");
      }
