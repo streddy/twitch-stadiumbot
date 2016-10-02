@@ -275,6 +275,8 @@ client.on("chat", function (channel, user, message, self) {
       client.action(streamhost,
                     "!yoquiero: Yo quiero Taco Bell.");
       client.action(streamhost,
+                    "!locotaco: DORITOS LOCO TACOS!!!");
+      client.action(streamhost,
                     "!wave : Start a Kappa wave! Complete the wave for a treat!");
       client.action(streamhost,
                     "!fightme: A brawl erupted in the stadium! Spam that KAPOW emote to come out on top!");
@@ -293,6 +295,11 @@ client.on("chat", function (channel, user, message, self) {
    if (message === "!yoquiero") {
       client.action(streamhost,
                     "~~~ TBTacoLeft TBTacoRight TBTacoLeft TBTacoRight ~~~");
+   }
+
+   if (message === "!locotaco") {
+      client.action(streamhost,
+                    "~~~ DoritosChip TBTacoLeft TBTacoRight DoritosChip DoritosChip TBTacoLeft TBTacoRight DoritosChip ~~~");
    }
 
    /* Wave */
