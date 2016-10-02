@@ -72,7 +72,7 @@ var waveFinish = function() {
 /* Checks every 10 seconds whether the chat is idle enough to start a wave */
 setInterval(function() {
   var delta = (Date.now() - startTime) * 1000;
-  if (!waveStarted) {
+  if (!waveStarted && !fightStarted) {
     if ((commentCount / delta) < 5) {
       waveInitiate();
     }
@@ -82,11 +82,11 @@ setInterval(function() {
 
 var fightFinish = function() {
   if (teamOneCount > teamTwoCount) {
-    client.action(streamhost, "Team One Wins!!");
+    client.action(streamhost, "Team Kappa Wins!!");
   }
 
   else if (teamTwoCount > teamOneCount) {
-    client.action(streamhost, "Team Two Wins!!");
+    client.action(streamhost, "Team Kreygasm Wins!!");
   }
 
   else {
@@ -154,7 +154,7 @@ client.on("chat", function (channel, user, message, self) {
 
    /* Handle wave behavior */
    if (waveStarted) {
-      if (message === waveMessage) {
+      if (message.indexOf(waveMessage) !== -1) {
          waveCounter++;
       }
       return;
@@ -240,7 +240,7 @@ client.on("chat", function (channel, user, message, self) {
       client.action(streamhost,
                     "!wave : Start a Kappa wave! Complete the wave for a treat!");
       client.action(streamhost,
-                    "!supersmash: A brawl erupted in the stadium! Spam that KAPOW emote to come out on top!");
+                    "!fightme: A brawl erupted in the stadium! Spam that KAPOW emote to come out on top!");
       client.action(streamhost,
                     "!kisscam: Make two users express their love for eachother <3");
       client.action(streamhost,
@@ -266,17 +266,17 @@ client.on("chat", function (channel, user, message, self) {
      }
    }
 
-   if (message === "!supersmash") {
+   if (message === "!fightme") {
      var userArr = Object.keys(users);
      fightStarted = true;
      for (var i = 0; i < Math.floor(userArr.length / 2); i++) {
        teamOne[userArr[i]] = true;
-       client.whisper(userArr[i], "You are on Team One!");
+       client.whisper(userArr[i], "You are fighting on Team Kappa!");
      }
 
      for (var i = Math.ceil(userArr.length / 2); i < userArr.length; i++) {
        teamTwo[userArr[i]] = true;
-       client.whisper(userArr[i], "You are on Team Two!");
+       client.whisper(userArr[i], "You are fighting on Team Kreygasm!");
      }
 
      setTimeout(fightFinish, 7000);
