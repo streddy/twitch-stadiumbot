@@ -29,7 +29,17 @@ client.on("chat", function (channel, user, message, self) {
 
    if (message === "!stadiumhelp") {
       client.action("tikkaman",
-                    "Here's a list of commands to give the chat a big stadium feel!\n!wave : Start a Kappa wave! Complete the wave for a treat!\n!neckbeard: Feeling hungry? Request some Doritos!\n!yoquiero: Yo quiero Taco Bell.\n!supersmash: A brawl erupted in the stadium! Spam that KAPOW emote to come out on top!\n!kisscam: Make two users express their love for eachother <3 \n!propose_'username': Embarass the love of your life in front of the stadium!\n");
+                    "Here's a list of commands to give the chat a big stadium feel!\n!wave : Start a Kappa wave! Complete the wave for a treat!\n!forthebold: Feeling hungry? Request some Doritos!\n!yoquiero: Yo quiero Taco Bell.\n!supersmash: A brawl erupted in the stadium! Spam that KAPOW emote to come out on top!\n!kisscam: Make two users express their love for eachother <3\n!propose_'username': Embarass the love of your life in front of the stadium!\n");
+   }
+
+   if (message === "!neckbeard") {
+      client.action("tikkaman",
+                    "~~~DoritosChip DoritosChip DoritosChip DoritosChip DoritosChip~~~");
+   }
+
+   if (message === "!yoquiero") {
+      client.action("tikkaman",
+                    "~~~TBTacoLeft TBTacoRight TBTacoLeft TBTacoRight~~~");
    }
 
    if (message === "!kisscam") {   
