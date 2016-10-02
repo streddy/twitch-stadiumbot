@@ -1,7 +1,22 @@
+// GLOBAL VARIABLES
 // stream host
 var streamhost = "tikkaman";
-// users associate array to store users who have commented
+// users associated array to store users who have commented
 var users = {};
+// are we in kiss mode?
+var kissmode = false;
+// kissers
+var kisser1;
+var kisser2;
+// kisser consent
+var kisser1consent = false;
+var kisser2consent = false;
+
+function resetKiss() {
+   kissmode = false;
+   kisser1consent = false;
+   kisser2consent = false;
+}
 
 var tmi = require('tmi.js');
 
@@ -45,6 +60,53 @@ client.on("chat", function (channel, user, message, self) {
    // add username to users associative array
    console.log(user.username);
    users[user.username] = true;
+
+   // handle kissing prompts
+   if (kissmode === true) {
+
+      // kisser 1 no consent
+      if (user.username === kisser1 && message.toUpperCase() === "NO") {
+         if (kisser1consent === false) {
+            client.action(streamhost,
+                          "<3 @" + kisser1 + " DOESN'T WANT TO KISS :( <3");
+            resetKiss();
+         }
+      
+      // kisser 2 no consent
+      } else if (user.username === kisser2 && message.toUpperCase() === "NO") {
+         if (kisser2consent === false) {
+            client.action(streamhost,
+                          "<3 @" + kisser2 + " DOESN'T WANT TO KISS :( <3");
+            resetKiss()
+         }
+      
+      // kisser1 wants to kiss
+      } else if (user.username === kisser1 && message.toUpperCase() === "YES") {
+         if (kisser2consent === true) {
+            client.action(streamhost,
+                          "<3 THEY KISSED!! <3");
+            resetKiss();
+         
+         } else {
+            client.action(streamhost,
+                          "<3 @" + kisser2 + ": @" + kisser1 + " WANTS TO KISS! WHAT DO YOU SAY? (YES/NO) <3");
+            kisser1consent = true;
+         }
+
+      // kisser2 wants to kiss
+      } else if (user.username === kisser2 && message.toUpperCase() === "YES") {
+         if (kisser1consent === true) {
+            client.action(streamhost,
+                          "<3 THEY KISSED!! <3");
+            resetKiss();
+         
+         } else {
+            client.action(streamhost,
+                          "<3 @" + kisser1 + ": @" + kisser2 + " WANTS TO KISS! WHAT DO YOU SAY? (YES/NO) <3");
+            kisser2consent = true;
+         }
+      }
+   }
 
    // help message
    if (message === "!stadiumhelp") {
@@ -93,11 +155,14 @@ client.on("chat", function (channel, user, message, self) {
             userfinder2 = Math.floor(Math.random() * userArr.length);
          }
       
-         var user1 = userArr[userfinder1];
-         var user2 = userArr[userfinder2];
+         kisser1 = userArr[userfinder1];
+         kisser2 = userArr[userfinder2];
 
          client.action(streamhost,
-                       "<3 @" + user1 + " AND @" + user2 + " ARE ON THE KISSCAM <3");
+                       "<3 @" + kisser1 + " AND @" + kisser2 + " ARE ON THE KISSCAM <3");
+         client.action(streamhost,
+                       "<3 WOULD YOU LIKE TO KISS? (YES/NO) <3");
+         kissmode = true;
       }
    }
 });
