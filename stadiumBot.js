@@ -77,8 +77,8 @@ var waveFinish = function() {
 /* Checks every 10 seconds whether the chat is idle enough to start a wave */
 setInterval(function() {
    var delta = (Date.now() - startTime) * 1000;
-   if (!waveStarted && !fightStarted) {
-      if ((commentCount / delta) < 5) {
+   if (!waveStarted && !fightStarted && !kissmode && !proposal) {
+      if ((commentCount / delta) < 1) {
          waveInitiate();
       }
    }
