@@ -1,1 +1,1 @@
-# twitch-kiss-cam
+# twitch-stadiumbot
