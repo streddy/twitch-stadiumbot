@@ -65,8 +65,10 @@ client.on("connected", function (address, port) {
 client.on("chat", function (channel, streamer, message, self) {
    if (self) return;
 
-   if (message === waveMessage && waveStarted) {
-      waveCounter++;
+   if (waveStarted) {
+      if (message === waveMessage) {
+         waveCounter++;
+      }
       return;
    }
 
