@@ -18,3 +18,7 @@ var options = {
 var client = new tmi.client(options);
 client.connect();
 
+client.on("connected", function (address, port) {
+   client.action("tikkaman",
+                 "You are now on a KissCam enabled chat! Make two users express their love for each other by typing '!kisscam'");
+});
