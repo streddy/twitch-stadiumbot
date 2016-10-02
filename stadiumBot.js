@@ -1,8 +1,17 @@
+/*-----------------------------------------------------------------------------
+Twitch StadiumBot
+Authors:
+   Sanjeev Reddy
+   Anfernee Goon
+   Sean Oh
+   Jimmy Yan
+-----------------------------------------------------------------------------*/
 
-var tmi = require('tmi.js');
+/* GLOBAL VARIABLES */
 
-/* Global variables */
-var streamhost = "tikkaman"
+/* General */
+var streamhost = "tikkaman";
+var users = {};
 
 /* Wave variables */
 var waveStartCounter = 0;
@@ -12,27 +21,21 @@ var waveCounter = 0;
 var startTime = Date.now();
 var commentCount = 0;
 
-var options = {
-   options: {
-      debug: true
-   },
-   connection: {
-      cluster: "aws",
-      reconnect: true
-   },
-   identity: {
-      username: "StadiumBot",
-      password: "oauth:37uvk4q1sad6msm7tojm2jatoah9gl"
-   },
-   channels: [streamhost]
-};
+/* KissCam variables */
+var kisser1;
+var kisser2;
+var kissmode = false;
+var kisser1consent = false;
+var kisser2consent = false;
 
-var client = new tmi.client(options);
-client.connect();
+/*---------------------------------------------------------------------------*/
+
+/* HELPER FUNCTIONS */
 
 /* Called when wave is started */
 var waveInitiate = function() {
-   client.action(streamhost, "Let's start a Kappa wave!! (Type Kappa to participate)");
+   client.action(streamhost,
+                 "Let's start a Kappa wave!! (Type Kappa to participate)");
    waveStarted = true;
    waveCounter = 0;
    setTimeout(waveFinish, 10000);
@@ -57,50 +60,6 @@ var waveFinish = function() {
   commentCount = 0;
 }
 
-client.on("connected", function (address, port) {
-   client.action(streamhost,
-                 "You are now on a StadiumBot enabled chat! Type '!stadiumhelp' for a list of cool features.");
-});
-
-client.on("chat", function (channel, streamer, message, self) {
-   if (self) return;
-
-   if (waveStarted) {
-      if (message === waveMessage) {
-         waveCounter++;
-      }
-      return;
-   }
-
-   if (message === "!stadiumhelp") {
-      client.action(streamhost,
-                    "Here's a list of commands to give the chat a big stadium feel!\n!wave : Start a Kappa wave! Complete the wave for a treat!\n!forthebold: Feeling hungry? Request some Doritos!\n!yoquiero: Yo quiero Taco Bell.\n!supersmash: A brawl erupted in the stadium! Spam that KAPOW emote to come out on top!\n!kisscam: Make two users express their love for eachother <3\n!propose_'username': Embarass the love of your life in front of the stadium!\n");
-   }
-
-   if (message === "!neckbeard") {
-      client.action(streamhost),
-                    "~~~DoritosChip DoritosChip DoritosChip DoritosChip DoritosChip~~~");
-   }
-
-   if (message === "!yoquiero") {
-      client.action(streamhost,
-                    "~~~TBTacoLeft TBTacoRight TBTacoLeft TBTacoRight~~~");
-   }
-
-   if (message === "!kisscam") {
-      client.action(streamhost, "<3 WELCOME TO KISSCAM <3");
-   }
-
-   if (message === "!wave") {
-     waveStartCounter++;
-     if (waveStartCounter >= 2) {
-       waveInitiate();
-     }
-   }
-
-   commentCount++;
-});
-
 /* Checks every 10 seconds whether the chat is idle enough to start a wave */
 setInterval(function() {
   var delta = (Date.now() - startTime) * 1000;
@@ -111,3 +70,183 @@ setInterval(function() {
   }
   startTime = Date.now();
 }, 20000);
+
+/* Reset kiss global variables */
+function resetKiss() {
+   kissmode = false;
+   kisser1consent = false;
+   kisser2consent = false;
+}
+
+/*---------------------------------------------------------------------------*/
+
+/* BOT AND EVENT HANDLING */
+
+var tmi = require('tmi.js');
+
+var options = {
+   options: {
+      debug: true
+   },
+   connection: {
+      cluster: "aws",
+      reconnect: true
+   },
+   identity: {
+      username: "StadiumBot",
+      password: "oauth:37uvk4q1sad6msm7tojm2jatoah9gl"
+   },
+   channels: [streamhost]
+};
+
+/* Connect client */
+var client = new tmi.client(options);
+client.connect();
+
+/* Output welcome message */
+client.on("connected", function (address, port) {
+   client.action(streamhost,
+                 "You are now on a StadiumBot enabled chat! Type '!stadiumhelp' for a list of cool features.");
+});
+
+/* Handle users leaving channel */
+client.on("part", function(channel, username, self) {
+   console.log(username + " is parting");
+   if (users[username] === true) {
+      delete users[username];
+   }
+});
+
+/* Command handling */
+client.on("chat", function (channel, user, message, self) {
+   if (self) return;
+   
+   /* Add username to users associative array */
+   console.log(user.username);
+   users[user.username] = true;
+   
+   /* Handle wave behavior */
+   if (waveStarted) {
+      if (message === waveMessage) {
+         waveCounter++;
+      }
+      return;
+   }
+
+   /* Handle kissing prompts */
+   if (kissmode) {
+
+      /* Kisser 1 no consent */
+      if (user.username === kisser1 && message.toUpperCase() === "NO") {
+         if (kisser1consent === false) {
+            client.action(streamhost,
+                          "<3 @" + kisser1 + " DOESN'T WANT TO KISS :( <3");
+            resetKiss();
+         }
+      
+      /* Kisser 2 no consent */
+      } else if (user.username === kisser2 && message.toUpperCase() === "NO") {
+         if (kisser2consent === false) {
+            client.action(streamhost,
+                          "<3 @" + kisser2 + " DOESN'T WANT TO KISS :( <3");
+            resetKiss()
+         }
+      
+      /* Kisser1 wants to kiss */
+      } else if (user.username === kisser1 && message.toUpperCase() === "YES") {
+         if (kisser2consent === true) {
+            client.action(streamhost,
+                          "<3 THEY KISSED!! <3");
+            resetKiss();
+         
+         } else {
+            client.action(streamhost,
+                          "<3 @" + kisser2 + ": @" + kisser1 + " WANTS TO KISS! WHAT DO YOU SAY? (YES/NO) <3");
+            kisser1consent = true;
+         }
+
+      /* Kisser2 wants to kiss */
+      } else if (user.username === kisser2 && message.toUpperCase() === "YES") {
+         if (kisser1consent === true) {
+            client.action(streamhost,
+                          "<3 THEY KISSED!! <3");
+            resetKiss();
+         
+         } else {
+            client.action(streamhost,
+                          "<3 @" + kisser1 + ": @" + kisser2 + " WANTS TO KISS! WHAT DO YOU SAY? (YES/NO) <3");
+            kisser2consent = true;
+         }
+      }
+   }
+
+   /* Help message */
+   if (message === "!stadiumhelp") {
+      client.action(streamhost,
+                    "Here's a list of commands to give the chat a big stadium feel!");
+      client.action(streamhost,
+                    "!forthebold: Feeling hungry? Request some Doritos!");
+      client.action(streamhost,
+                    "!yoquiero: Yo quiero Taco Bell.");
+      client.action(streamhost,
+                    "!wave : Start a Kappa wave! Complete the wave for a treat!");
+      client.action(streamhost,
+                    "!supersmash: A brawl erupted in the stadium! Spam that KAPOW emote to come out on top!");
+      client.action(streamhost,
+                    "!kisscam: Make two users express their love for eachother <3");
+      client.action(streamhost,
+                    "!propose_'username': Embarass the love of your life in front of the stadium!");
+   }
+   
+   /* Food messages */
+   if (message === "!forthebold") {
+      client.action(streamhost,
+                    "~~~ DoritosChip DoritosChip DoritosChip DoritosChip DoritosChip ~~~");
+   }
+
+   if (message === "!yoquiero") {
+      client.action(streamhost,
+                    "~~~ TBTacoLeft TBTacoRight TBTacoLeft TBTacoRight ~~~");
+   }
+
+   /* Wave */
+   if (message === "!wave") {
+     waveStartCounter++;
+     if (waveStartCounter >= 2) {
+       waveInitiate();
+     }
+   }
+
+   /* Kisscam */
+   if (message === "!kisscam") {
+      var userArr = Object.keys(users);
+
+      client.action(streamhost,
+                    "<3 WELCOME TO KISSCAM <3");
+     
+      /* If there is only one recorded user */
+      if (userArr.length < 2) {
+         client.action(streamhost,
+                       "<3 YOU'RE THE ONLY ONE HERE. WANT TO KISS YOURSELF? <3");
+      } else {   
+         var userfinder1 = Math.floor(Math.random() * userArr.length);
+         var userfinder2 = Math.floor(Math.random() * userArr.length);
+
+         while(userfinder1 === userfinder2) {
+            userfinder2 = Math.floor(Math.random() * userArr.length);
+         }
+      
+         kisser1 = userArr[userfinder1];
+         kisser2 = userArr[userfinder2];
+
+         client.action(streamhost,
+                       "<3 @" + kisser1 + " AND @" + kisser2 + " ARE ON THE KISSCAM <3");
+         client.action(streamhost,
+                       "<3 WOULD YOU LIKE TO KISS? (YES/NO) <3");
+         kissmode = true;
+      }
+   }
+   
+   /* For wave counting */
+   commentCount++;
+});
