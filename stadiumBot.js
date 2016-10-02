@@ -236,6 +236,30 @@ client.on("chat", function (channel, user, message, self) {
       }
    }
 
+   /* Handle proposals */
+   if (proposal) {
+      if (user.username === fiance) {
+         if (message.toUpperCase() === "YES") {
+            var haiku = Math.floor(Math.random() * extras.lovekus.length);
+
+            client.action(streamhost,
+                          "@" + fiance + " says 'I do'!!!");
+            client.action(streamhost,
+                          "CONGRATULATIONS!!! Here is a celebratory haiku:");
+            client.action(streamhost, extras.lovekus[haiku]);
+
+         } else if (message.toUpperCase() === "NO") {
+            var haiku = Math.floor(Math.random() * extras.sadkus.length);
+
+            client.action(streamhost,
+                          "@" + fiance + " politely declines.);
+            client.action(streamhost,
+                          "lol... Here is a sad haiku to wallow in your rejection:");
+            client.action(streamhost, extras.sadkus[haiku]);
+         }
+      }
+   }
+
    /* Help message */
    if (message === "!stadiumhelp") {
       client.action(streamhost,
@@ -332,15 +356,22 @@ client.on("chat", function (channel, user, message, self) {
 
          /* Make sure the fiance exists */
          if (users.hasOwnProperty(fiance)) {
+            var emote = Math.floor(Math.random() * extras.emotes.length);
+
             client.action(streamhost,
                           "@" + user.username + " gets down on one knee...");
             client.action(streamhost,
                           "@" + user.username + " looks deep into @" + fiance + "'s eyes...");
             client.action(streamhost,
+                          "@" + user.username + " pulls out a ring with a " + extras.emotes[emote] + " shaped diamond...");
+            client.action(streamhost,
                           "@" + fiance + ": Will you marry @" + user.username + "? (Yes/No)");
+
+            proposal = true;
          }
       }
    }
+
    /* For wave counting */
    commentCount++;
 });
