@@ -12,6 +12,7 @@ Authors:
 /* General */
 var streamhost = "tikkaman";
 var users = {};
+var extras = require("./extras.json");
 
 /* Wave variables */
 var waveStartCounter = 0;
@@ -29,13 +30,16 @@ var teamOne = {};
 var teamTwo = {};
 var fightMessage = "KAPOW"
 
-
 /* KissCam variables */
 var kisser1;
 var kisser2;
 var kissmode = false;
 var kisser1consent = false;
 var kisser2consent = false;
+
+/* Proposal variables */
+var fiance;
+var proposal = false;
 
 /*---------------------------------------------------------------------------*/
 
@@ -206,7 +210,7 @@ client.on("chat", function (channel, user, message, self) {
 
       /* Kisser1 wants to kiss */
       } else if (user.username === kisser1 && message.toUpperCase() === "YES") {
-         if (kisser2consent === true) {
+         if (kisser2consent) {
             client.action(streamhost,
                           "<3 THEY KISSED!! <3");
             resetKiss();
@@ -219,7 +223,7 @@ client.on("chat", function (channel, user, message, self) {
 
       /* Kisser2 wants to kiss */
       } else if (user.username === kisser2 && message.toUpperCase() === "YES") {
-         if (kisser1consent === true) {
+         if (kisser1consent) {
             client.action(streamhost,
                           "<3 THEY KISSED!! <3");
             resetKiss();
@@ -235,7 +239,7 @@ client.on("chat", function (channel, user, message, self) {
    /* Help message */
    if (message === "!stadiumhelp") {
       client.action(streamhost,
-                    "Here's a list of commands to give the chat a big stadium feel!");
+                    "Here's a list of commands to give the chat that big stadium feel!");
       client.action(streamhost,
                     "!forthebold: Feeling hungry? Request some Doritos!");
       client.action(streamhost,
@@ -269,6 +273,7 @@ client.on("chat", function (channel, user, message, self) {
      }
    }
 
+   /* Fightme */
    if (message === "!fightme") {
      var userArr = Object.keys(users);
      fightStarted = true;
@@ -317,6 +322,25 @@ client.on("chat", function (channel, user, message, self) {
       }
    }
 
+   /* Propose */
+   if (message.includes("propose_")) {
+      var splitMessage = message.split(" ");
+
+      /* Ensure we are only working with the command */
+      if (splitMessage.length === 1) {
+         fiance = message.substring(8);
+
+         /* Make sure the fiance exists */
+         if (users.hasOwnProperty(fiance)) {
+            client.action(streamhost,
+                          "@" + user.username + " gets down on one knee...");
+            client.action(streamhost,
+                          "@" + user.username + " looks deep into @" + fiance + "'s eyes...");
+            client.action(streamhost,
+                          "@" + fiance + ": Will you marry @" + user.username + "? (Yes/No)");
+         }
+      }
+   }
    /* For wave counting */
    commentCount++;
 });
